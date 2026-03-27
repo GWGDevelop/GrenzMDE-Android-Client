@@ -9,7 +9,6 @@ android {
 			minorApiLevel = 1
 		}
 	}
-
 	defaultConfig {
 		applicationId = "dk.grenzhandel.mde2026"
 		minSdk = 23

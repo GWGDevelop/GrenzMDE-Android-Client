@@ -2,13 +2,17 @@ package dk.grenzhandel.mde2026
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import java.io.File
 import kotlin.system.exitProcess
 
 data class MDEConfigData(
-	val appConfigDir: String,
-	val appConfigFile: String, //Dieser Eintrag kann nur beim Start aus den Defaults gesetzt werden. Deshalb ist er als "val" definiert, nicht "var".
+	var appConfigDir: String,
+	val appConfigFile: String,
+	var appConfigFileExists: Boolean,
 	var MDEStartupTitle: String,
 	var srvrAddress: String,
 	var srvrPort: Int,
@@ -28,27 +32,13 @@ data class MDEConfigData(
 ) {
 
 	companion object {
-		fun GetConfig(aContext: Context): MDEConfigData {
-			var Result = SetDefaultConfig(aContext)
-			val StorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-/*
-			val ConfigDatei = File(Result.appConfigFile)
-			if (ConfigDatei.exists()) {
-//				loadXmlOverrides(Result)
-			}
-			else {
-				ConfigDatei.parentFile?.mkdirs()
-//				saveXmlConfig(Result)
-			}
- */
-			return Result
-		}
-
-		fun SetDefaultConfig (aContext: Context): MDEConfigData {
+		fun DefaultConfig (aContext: Context): MDEConfigData
+		{
 			val json = aContext.assets.open("MDEConfigDefaults.json").bufferedReader().use{it.readText()}
 			try
 			{
- 				val Result = Gson().fromJson(json, MDEConfigData::class.java)
+ 				var Result = Gson().fromJson(json, MDEConfigData::class.java)
+				Result.appConfigDir = Environment.DIRECTORY_DOCUMENTS
 				return Result
 			}
 			catch (e: Error)
@@ -56,6 +46,48 @@ data class MDEConfigData(
 				Toast.makeText(aContext, "Fehler beim Laden der Standardeinstellungen! Beende Programm", Toast.LENGTH_LONG).show()
 				exitProcess(0)
 			}
-		}
-	}
+		} //fun DefaultConfig
+
+		fun GetConfig(aContext: Context): MDEConfigData
+		{
+			var Result = DefaultConfig(aContext)
+			try {
+				val StorageDir = Environment.getExternalStoragePublicDirectory(Result.appConfigDir)
+				val ConfigFile = File(StorageDir, Result.appConfigFile)
+				if (!ConfigFile.exists())
+				{
+					Result.appConfigFileExists = false
+					SaveConfig(Result, aContext)
+				}
+				else	{
+					Result = Gson().fromJson(ConfigFile.readText(), MDEConfigData::class.java)
+					Result.appConfigFileExists = true
+				}
+			}
+			catch (e: Error) {
+				Toast.makeText(aContext, "Fehler beim Laden der Konfigurationsdatei!", Toast.LENGTH_LONG).show()
+			}
+			return Result
+		} //fun GetConfig
+
+		fun SaveConfig(Config: MDEConfigData, aContext: Context)
+		{
+			try {
+				val StorageDir = Environment.getExternalStoragePublicDirectory(Config.appConfigDir)
+				if (!StorageDir.exists())
+					StorageDir.mkdirs()
+				val ConfigFile = File(StorageDir, Config.appConfigFile)
+				val GSON = GsonBuilder().setPrettyPrinting().create()
+				val JSON = GSON.toJson(Config)
+				Config.appConfigFileExists = true
+				ConfigFile.writeText(JSON)
+				Toast.makeText(aContext, "Konfiguration gespeichert in ${ConfigFile.absolutePath}", Toast.LENGTH_LONG).show()
+			}
+			catch (e: Exception) {
+				Config.appConfigFileExists = false
+				Toast.makeText(aContext, "Fehler beim Speichern der Konfiguration: ${e.toString()}", Toast.LENGTH_LONG).show()
+				Log.e("MDEConfig", "Fehler beim Speichern der Datei!", e)
+			}
+		} //fun SaveConfig
+	} //companion Object
 }

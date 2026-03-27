@@ -1,6 +1,7 @@
 package dk.grenzhandel.mde2026
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.ContextThemeWrapper
@@ -11,12 +12,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 
 class MDEStart : AppCompatActivity() {
+	private val STORAGE_PERMISSION_REQUEST = 1234
 	lateinit var Config: MDEConfigData
 	lateinit var BtnConnect: Button
 	lateinit var TxTitle: TextView
@@ -41,6 +44,12 @@ class MDEStart : AppCompatActivity() {
 		TxPort = findViewById<TextView>(R.id.txPort)
 		val BoxButtons = findViewById<LinearLayout>(R.id.bxCompanyButtons)
 		Config = (application as MDEApplication).MDEConfig
+		if (!Config.appConfigFileExists) {
+			if (ensureStoragePermission())
+				MDEConfigData.SaveConfig(Config, this)
+			else
+				Toast.makeText(this, "Konfiguration NICHT gespeichert - Berechtigung wurde verweigert.", Toast.LENGTH_LONG).show()
+		}
 
 		TxTitle.text = Config.MDEStartupTitle
 		TxServer.text = Config.srvrAddress
@@ -63,6 +72,16 @@ class MDEStart : AppCompatActivity() {
 			BoxButtons.addView(Btn)
 		}
 		UpdateButtons()
+	}
+
+	private fun ensureStoragePermission(): Boolean {
+		val permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+		if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+			return true
+		}
+		// Benutzer um Erlaubnis fragen
+		requestPermissions(arrayOf(permission), STORAGE_PERMISSION_REQUEST)
+		return false
 	}
 
 	private fun UpdateButtons()

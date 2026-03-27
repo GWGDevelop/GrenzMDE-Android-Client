@@ -1,5 +1,5 @@
 {
-	"appConfigFile": "/storage/emulated/0/MDE/Config.xml",
+	"appConfigFile": "Config.json",
 	"MDEStartupTitle": "Lutzis Mobile Datenerfassung",
 	"srvrAddress": "S-MDEServer.MyCompany",
 	"srvrPort": 9999,
