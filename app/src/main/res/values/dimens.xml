@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="loginBoxWidth">300dp</dimen>
+	<dimen name="loginHeaderWidth">250dp</dimen>
+	<dimen name="loginCaptionWidth">130dp</dimen>
+	<dimen name="loginEditWidth">200dp</dimen>
+	<dimen name="btnCompanyHeight">200dp</dimen>
+
+</resources>

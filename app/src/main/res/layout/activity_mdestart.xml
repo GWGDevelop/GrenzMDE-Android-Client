@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		android:id="@+id/main"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:context=".MDEStart">
+
+	<TextView
+			android:id="@+id/txStartupTitle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="24dp"
+			android:layout_marginEnd="16dp"
+			android:text="Grenzhandel\nMobile\nDatenerfassung"
+			android:textAlignment="center"
+			android:textSize="24sp"
+			android:textStyle="bold"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+	<TextView
+			android:id="@+id/txCpServer"
+			android:layout_width="100dp"
+			android:layout_height="19dp"
+			android:layout_marginStart="8dp"
+			android:layout_marginTop="16dp"
+			android:text="Server:"
+			android:textAlignment="textEnd"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/txStartupTitle" />
+
+	<TextView
+			android:id="@+id/txServer"
+			android:layout_width="180dp"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="8dp"
+			android:text="S-MDE.grenzhandel.local"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/txCpServer"
+			app:layout_constraintTop_toTopOf="@+id/txCpServer" />
+
+
+	<TextView
+			android:id="@+id/txCpPort"
+			android:layout_width="100dp"
+			android:layout_height="19dp"
+			android:layout_marginStart="8dp"
+			android:layout_marginTop="8dp"
+			android:text="Port:"
+			android:textAlignment="textEnd"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/txCpServer" />
+
+	<TextView
+			android:id="@+id/txPort"
+			android:layout_width="180dp"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="8dp"
+			android:text="9999"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/txCpPort"
+			app:layout_constraintTop_toTopOf="@+id/txCpPort" />
+
+	<TextView
+			android:id="@+id/txCpHinweisMandant"
+			android:layout_width="0dp"
+			android:layout_height="19dp"
+			android:layout_marginStart="40dp"
+			android:layout_marginTop="24dp"
+			android:text="Bitte Mandant wählen:"
+			android:textAlignment="textStart"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/txCpPort" />
+
+	<Button
+			android:id="@+id/btnConnect"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginEnd="16dp"
+			android:backgroundTint="#F44336"
+			android:text="Verbindung zum Server öffnen"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintHorizontal_bias="0.0"
+			app:layout_constraintStart_toStartOf="parent" />
+
+	<ScrollView
+			android:layout_width="318dp"
+			android:layout_height="0dp"
+			android:layout_marginStart="32dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginBottom="16dp"
+			app:layout_constraintBottom_toTopOf="@+id/btnConnect"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/txCpHinweisMandant">
+
+		<LinearLayout
+				android:id="@+id/bxCompanyButtons"
+				android:layout_marginStart="32dp"
+				android:layout_marginEnd="32dp"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"/>
+	</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

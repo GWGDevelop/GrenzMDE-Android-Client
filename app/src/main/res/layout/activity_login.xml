@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:tools="http://schemas.android.com/tools"
+		android:id="@+id/LyoMain"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+
+	<TextView
+			android:id="@+id/LbServerConnection"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="16dp"
+			android:text="Company@Server"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+
+	<!-- Zentrierter Container mit fester Breite -->
+	<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/BoxLogin"
+			android:layout_width="@dimen/loginBoxWidth"
+			android:layout_height="wrap_content"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+
+
+		<!-- ===== Zeile 1 ===== -->
+		<TextView
+				android:id="@+id/LbDescription"
+				android:layout_width="@dimen/loginHeaderWidth"
+				android:layout_height="wrap_content"
+				android:text="Gib Anmeldename und Passwort ein oder scanne deinen MDE-Barcode."
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent" />
+
+		<!-- ===== Zeile 2 ===== -->
+		<TextView
+				android:id="@+id/LbUserName"
+				android:layout_width="@dimen/loginCaptionWidth"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:text="MDE-Anmeldename:"
+				app:layout_constraintBottom_toBottomOf="@id/EdUserName"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/LbDescription" />
+
+		<EditText
+				android:id="@+id/EdUserName"
+				android:layout_width="@dimen/loginEditWidth"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:inputType="text"
+				app:layout_constraintStart_toEndOf="@id/LbUserName"
+				app:layout_constraintTop_toBottomOf="@id/LbDescription" />
+
+		<!-- ===== Zeile 3 ===== -->
+		<TextView
+				android:id="@+id/LbPwd"
+				android:layout_width="@dimen/loginCaptionWidth"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:text="Passwort:"
+				app:layout_constraintBottom_toBottomOf="@id/EdPwd"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/EdUserName" />
+
+		<EditText
+				android:id="@+id/EdPwd"
+				android:layout_width="@dimen/loginEditWidth"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:ems="10"
+				android:inputType="textPassword"
+				app:layout_constraintStart_toEndOf="@id/LbPwd"
+				app:layout_constraintTop_toBottomOf="@id/EdUserName" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+	<Button
+			android:id="@+id/BtnLogin"
+			android:layout_width="200dp"
+			android:layout_height="60dp"
+			android:layout_marginBottom="8dp"
+			android:onClick="OnClickBtnLogin"
+			android:text="Anmelden"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

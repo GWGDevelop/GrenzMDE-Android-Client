@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+	<!-- Base application theme. -->
+
+	<style name="Theme.MDE2026" parent="Theme.Material3.DayNight.NoActionBar" />
+
+	<style name="ShapeAppearance.MDE.Button.Round" parent="ShapeAppearance.M3.Comp.Button.Small.Container.Shape.Round">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">50%</item>
+	</style>
+
+	<style name="CompanyButtonStyle" parent="Widget.Material3.Button">
+		<item name="shapeAppearance">@style/ShapeAppearance.MDE.Button.Round</item>
+		<item name="android:textColor">@android:color/white</item>
+	</style>
+</resources>

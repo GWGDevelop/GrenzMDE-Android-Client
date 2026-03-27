@@ -1,0 +1,25 @@
+{
+	"appConfigFile": "/storage/emulated/0/MDE/Config.xml",
+	"MDEStartupTitle": "Lutzis Mobile Datenerfassung",
+	"srvrAddress": "S-MDEServer.MyCompany",
+	"srvrPort": 9999,
+	"NAVDefaultCompany": "Poetzsch",
+	"NAVAvailableCompanies": [
+		"Frantzen",
+		"Jürgensen",
+		"Löwenbräu",
+		"Schlitz"
+	],
+	"scnPrefix": "BR",
+	"scnSuffix": "//\n",
+	"scnAllowedTypes": [
+		"EAN 13",
+		"CODE 128"
+	],
+	"scnIntentAction": "device.scanner.EVENT",
+	"scnEventBCOK": "EXTRA_EVENT_DECODE_RESULT",
+	"scnEventBCContent": "EXTRA_EVENT_DECODE_VALUE",
+	"scnEventBCLength": "EXTRA_EVENT_DECODE_LENGTH",
+	"scnEventBCType": "EXTRA_EVENT_SYMBOL_NAME",
+	"scnDebugBarcodeTypes": true
+}
