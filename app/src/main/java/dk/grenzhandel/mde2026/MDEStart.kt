@@ -1,9 +1,11 @@
 package dk.grenzhandel.mde2026
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.Button
@@ -16,7 +18,18 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.PrintWriter
+import java.net.Socket
+import java.util.Locale
+import java.util.Locale.getDefault
 
 class MDEStart : AppCompatActivity() {
 	private val STORAGE_PERMISSION_REQUEST = 1234
@@ -96,6 +109,15 @@ class MDEStart : AppCompatActivity() {
 		}
 	}
 
+	private fun ShowWaitDialog(Title: String, Msg: String): AlertDialog
+	{
+		val builder = AlertDialog.Builder(this)
+		builder.setTitle(Title)
+		builder.setMessage(Msg)
+		builder.setCancelable(false)
+		return builder.show()
+	}
+
 	private fun OnClickBtnConnect(aView: View)
 	{
 		if ( SelectedCompany == "")
@@ -104,8 +126,78 @@ class MDEStart : AppCompatActivity() {
 			Toast.makeText(this, "Verbinde mit ${SelectedCompany}@${Config.srvrAddress}:${Config.srvrPort}", Toast.LENGTH_LONG).show()
 			Config.NAVSelectedCompany = SelectedCompany
 
-			val itLogin = Intent(this, ActLogin::class.java)
-			startActivity(itLogin)
+			val DlgConnecting = ShowWaitDialog("Bitte warten", "Verbinde mit "+Config.srvrAddress)
+
+			MDETcpClient.connectAsync(Config.srvrAddress, Config.srvrPort, ::ConnectResult, lifecycleScope)
+
+/*
+			lifecycleScope.launch	{
+				val connected = MDETcpClient.connect(Config.srvrAddress, Config.srvrPort)
+				if (!connected) try
+				{
+					DlgConnecting.dismiss()
+					Toast.makeText(this@MDEStart, "Verbindung fehlgeschlagen", Toast.LENGTH_LONG).show()
+					return@launch
+				}
+				catch (e: Exception)
+				{
+					Log.e("MDEStart", "Fehler beim Verbinden mit Server ${Config.srvrAddress}:${Config.srvrPort}")
+					Toast.makeText(this@MDEStart, "Verbindung fehlgeschlagen", Toast.LENGTH_LONG).show()
+				}
+				val requestJson = """{"action":"hello","device":"PPMDE-99"}"""
+				val Response = MDETcpClient.sendCommand(requestJson)
+				DlgConnecting.dismiss()
+
+				if (Response != null)
+				{
+					val RespJSON = JSONObject(Response)
+					val page = RespJSON.optString("page").lowercase()
+					if (page == "login")
+					{
+						val itLogin = Intent(this@MDEStart, ActLogin::class.java)
+						startActivity(itLogin)
+					}
+					else
+					{
+						Toast.makeText(this@MDEStart, "unbekannter Seitenaufruf: ${page}", Toast.LENGTH_LONG).show()
+						Log.d("TCP", "Unerwartete Antwort: $RespJSON")
+					}
+				}
+				else //responseJSON==null
+				{
+					Log.e("TCP", "Fehler beim Empfangen der Antwort")
+				}
+			}
+
+ */
 		}
 	}
+
+	fun ConnectResult(IsConnected: Boolean, HostName: String?)
+	{
+		if (IsConnected)
+		{
+			val Cmd = """{"action":"hello","device":"PPMDE-99"}"""
+			MDETcpClient.sendAsync(Cmd, ::HelloReply, lifecycleScope, this@MDEStart)
+		}
+		else
+			Toast.makeText(this@MDEStart, "Verbindung zu Server ${HostName} fehlgeschlagen", Toast.LENGTH_LONG).show()
+	}
+
+	fun HelloReply(Reply: String)
+	{
+		val RespJSON = JSONObject(Reply)
+		val page = RespJSON.optString("page").lowercase()
+		if (page == "login")
+		{
+			val itLogin = Intent(this@MDEStart, ActLogin::class.java)
+			startActivity(itLogin)
+		}
+		else
+		{
+			Toast.makeText(this@MDEStart, "unbekannter Seitenaufruf: ${page}", Toast.LENGTH_LONG).show()
+			Log.d("TCP", "Unerwartete Antwort: $RespJSON")
+		}
+	}
+
 }

@@ -1,14 +1,14 @@
 {
 	"appConfigFile": "Config.json",
-	"MDEStartupTitle": "Lutzis Mobile Datenerfassung",
-	"srvrAddress": "S-MDEServer.MyCompany",
+	"MDEStartupTitle": "Mobile Datenerfassung im Grenzhandel",
+	"srvrAddress": "W-Thrawn19.grenzhandel.local",
 	"srvrPort": 9999,
 	"NAVDefaultCompany": "Poetzsch",
 	"NAVAvailableCompanies": [
-		"Frantzen",
-		"Jürgensen",
-		"Löwenbräu",
-		"Schlitz"
+		"Poetzsch",
+		"Duborg",
+		"GWG",
+		"Casita"
 	],
 	"scnPrefix": "BR",
 	"scnSuffix": "//\n",
