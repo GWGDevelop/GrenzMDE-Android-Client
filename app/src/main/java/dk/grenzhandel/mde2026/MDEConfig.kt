@@ -16,6 +16,8 @@ data class MDEConfigData(
 	var MDEStartupTitle: String,
 	var srvrAddress: String,
 	var srvrPort: Int,
+	var TCPTerminator: String,
+	var TCPTimeout: Int,
 	var NAVDefaultCompany: String,
 	var NAVAvailableCompanies: List<String>,
 	var NAVSelectedCompany: String,
@@ -31,7 +33,8 @@ data class MDEConfigData(
 	var scnDebugBarcodeTypes: Boolean
 ) {
 
-	companion object {
+	companion object
+	{
 		fun DefaultConfig (aContext: Context): MDEConfigData
 		{
 			val json = aContext.assets.open("MDEConfigDefaults.json").bufferedReader().use{it.readText()}
@@ -51,6 +54,7 @@ data class MDEConfigData(
 		fun GetConfig(aContext: Context): MDEConfigData
 		{
 			var Result = DefaultConfig(aContext)
+/*
 			try {
 				val StorageDir = Environment.getExternalStoragePublicDirectory(Result.appConfigDir)
 				val ConfigFile = File(StorageDir, Result.appConfigFile)
@@ -67,6 +71,7 @@ data class MDEConfigData(
 			catch (e: Error) {
 				Toast.makeText(aContext, "Fehler beim Laden der Konfigurationsdatei!", Toast.LENGTH_LONG).show()
 			}
+ */
 			return Result
 		} //fun GetConfig
 

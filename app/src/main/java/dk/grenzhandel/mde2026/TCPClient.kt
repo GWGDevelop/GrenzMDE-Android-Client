@@ -1,137 +1,142 @@
 package dk.grenzhandel.mde2026
 
+import android.app.ProgressDialog
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.InetSocketAddress
 import java.net.Socket
-import java.nio.channels.SocketChannel
-import java.util.concurrent.atomic.AtomicBoolean
+import java.net.SocketTimeoutException
+import java.util.concurrent.Executors
 
-object MDETcpClient {
- 	private var Server: String = ""
- 	private var Port: Int = 0
-	private var TCPConnection: Socket? = null
-	private var Sender: BufferedWriter? = null
-	private var Receiver: BufferedReader? = null
-	private var CmdTerminator: String = "||>>§§<<||"
+object MDETcpClient
+{
+	private var Terminator: String = "\n"
+	private var socket: Socket? = null
+	private var reader: InputStreamReader? = null
+	private var writer: OutputStreamWriter? = null
+	private val uiHandler = Handler(Looper.getMainLooper())
+	private val executor = Executors.newSingleThreadExecutor()
+	private var waitDialog: ProgressDialog? = null
+	private var IsConnected: Boolean = false
 
-	private val connected = AtomicBoolean(false)
-
-	suspend fun connect(aHost: String, aPort: Int): Boolean =
-		withContext(Dispatchers.IO)
-		{
-			try
-			{
-				if (connected.get())
-					return@withContext true
-				Server = aHost
-				Port = aPort
-				TCPConnection = Socket(aHost, aPort).apply { soTimeout = 2000 }
-				Sender = BufferedWriter(OutputStreamWriter(TCPConnection!!.getOutputStream()))
-				Receiver = BufferedReader(InputStreamReader(TCPConnection!!.getInputStream()))
-				connected.set(TCPConnection!!.isConnected)
-				Log.i("MDETcpClient", "Verbunden mit $Server:$Port")
-				connected.get()	//Connect.Result
-			}
-			catch (e: Exception)
-			{
-				Log.e("MDETcpClient", "Verbindungsaufbau zu $Server fehlgeschlagen", e)
-				false //Connect.Result
+	private fun showWait(ctx: Context, text: String) {
+		uiHandler.post {
+			waitDialog = ProgressDialog(ctx).apply {
+				setMessage(text)
+				setCancelable(false)
+				show()
 			}
 		}
+	}
 
-	suspend fun sendCommand(Command: String): String? =
-		withContext(Dispatchers.IO)
-		{
-			if (!connected.get())
-				return@withContext null
+	private fun hideWait()
+	{
+		uiHandler.post { waitDialog?.dismiss() }
+	}//fun hideWait
+
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	fun Connect(ctx: Context, aHost: String, aPort: Int,
+								aTerminator: String, aTimeout: Int,  OnConnected: (Boolean) -> Unit
+								)
+	{
+		executor.execute {
+			if (IsConnected)
+			{
+				uiHandler.post { OnConnected(true) }
+			}
+			else
+				try {
+					showWait(ctx, "Verbinde mit Server...")
+					Terminator = aTerminator
+					socket = Socket()
+					socket!!.connect(InetSocketAddress(aHost, aPort), aTimeout)
+					socket!!.soTimeout = aTimeout
+					reader = InputStreamReader(socket!!.getInputStream(), Charsets.UTF_8)
+					writer = OutputStreamWriter(socket!!.getOutputStream(), Charsets.UTF_8)
+					hideWait()
+					IsConnected = true
+					uiHandler.post { OnConnected(true) }
+				}
+				catch (ex: Exception)
+				{
+					hideWait()
+					Disconnect()
+					uiHandler.post { OnConnected(false) }
+				}
+		}
+	}//fun Connect
+
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	fun SendCommand(ctx: Context, JSONCommand: String, ReplyCallback: (String) -> Unit)
+	{
+		showWait(ctx, "Sende Befehl...")
+
+		executor.execute {
 			try {
-				Sender?.apply {
-				  write(encode(Command))
+				Log.d("TCP", "Sende an Server: ${JSONCommand} mit Terminator ${Terminator}")
+				// --- Senden inkl. Terminator ---
+				writer?.apply {
+					write(JSONCommand)
+					write(Terminator)
 					flush()
 				}
 
-				var line: String = ""
-				do
-				{
-					line = line + Receiver?.readLine()
-				} while (!line.contains(CmdTerminator))
+				// --- Antwort lesen bis Terminator ---
+				val reply = readUntilTerminator()
 
-				return@withContext line?.let { decode(it) }
-			}
-			catch (e: Exception) {
-				Log.e("MDETcpClient", "Fehler beim Senden an $Server", e)
-				null
+				hideWait()
+				uiHandler.post { ReplyCallback(reply) }
+
+			} catch (ex: SocketTimeoutException) {
+				hideWait()
+				uiHandler.post {
+					ReplyCallback("""{"error":"Timeout waiting for server reply"}""")
+				}
+			} catch (ex: Exception) {
+				hideWait()
+				uiHandler.post {
+					ReplyCallback("""{"error":"Communication error"}""")
+				}
 			}
 		}
+	}//fun SendCommand
 
-	suspend fun disconnect() =
-		withContext(Dispatchers.IO)
-		{
-			try
-			{
-				connected.set(false)
-				Receiver?.close()
-				Sender?.close()
-				TCPConnection?.close()
-			}
-			catch (e: Exception)
-			{
-				Log.e("MDETcpClient", "Fehler beim Trennen der Verbindung zu $Server", e)
-			}
-		}
-
-	fun connectAsync(aHost: String, aPort: Int,
-										ConnectResult: (Boolean, String) -> Unit,
-										LaunchScope: CoroutineScope = GlobalScope
-										)
+	// ------------------------------------------------------------
+	private fun readUntilTerminator(): String
 	{
-		LaunchScope.launch(Dispatchers.IO) {
-			val connected = connect(aHost, aPort)
-			ConnectResult(connected, aHost)
-		}
-	}
+		val buffer = StringBuilder()
+		val termLen = Terminator.length
+		val charBuffer = CharArray(1)
 
-	fun sendAsync(json: String, onResult: (String) -> Unit,
-								LaunchScope: CoroutineScope = GlobalScope,
-								aContext: Context?
-	 							)
-	{
-		LaunchScope.launch(Dispatchers.IO) {
-			val reply = sendCommand(json)
-			if (reply.isNullOrBlank())
-			{
-				if (aContext != null)
-					Toast.makeText(aContext, "Befehl nicht gesendet: keine Sevrer-Verbindung geöffnet.", 5).show()
+		while (true) {
+			val read = reader?.read(charBuffer) ?: -1
+			if (read < 0) throw IOException("Server closed connection")
+
+			buffer.append(charBuffer[0])
+
+			if (buffer.length >= termLen &&
+				buffer.substring(buffer.length - termLen) == Terminator
+			) {
+				return buffer.substring(0, buffer.length - termLen)
 			}
-			else
-	 			onResult(reply)
 		}
-	}
+	}//fun readUntilTerminator
 
-
-//Zur Zeit kein Encoding - gib zurück, was du kriegst.
- 	private fun encode(s: String): String = s
-/*
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	fun Disconnect()
 	{
-		val SafeChars = """abcdefghijklmonpqrstuvwxyz 0123456789"{}ABCDEFGHIJKLMNOPQRSTUVWXYZ|()[\]<>?@!#$%&'*+,-./:;^_`~"""
-		var Result = ""
-		s.forEach { ch ->
-			if (SafeChars.contains(ch))
-				Result = Result + ch
-			else
-				Result = Result + "=" + ch.or
-		 }
-
-		s + CmdTerminator
-	}
-*/
-	private fun decode(s: String): String = s
-}
+		try {
+			IsConnected = false
+			reader?.close()
+			writer?.close()
+			socket?.close()
+		}
+		catch (_: Exception) {}
+		reader = null
+		writer = null
+		socket = null
+	}//fun Disconnect
+}//object MDETcpClient

@@ -26,10 +26,11 @@ object ScannerManager: DefaultLifecycleObserver
 		listener = onScan
 		aLifecycleOwner.lifecycle.addObserver(this)
 		register(aContext)
-	}
+	}//fun initialize
 
 	@SuppressLint("UnspecifiedRegisterReceiverFlag")
-	private fun register(aContext: Context) {
+	private fun register(aContext: Context)
+	{
 		if (receiver != null) return
 
 		receiver = object : BroadcastReceiver() {
@@ -67,12 +68,13 @@ object ScannerManager: DefaultLifecycleObserver
 			}
 		}
 		aContext.registerReceiver(receiver, IntentFilter(MDEConfig.scnIntentAction))
-	}
+	}//fun register
 
-	override fun onPause(owner: LifecycleOwner) {
+	override fun onPause(owner: LifecycleOwner)
+	{
 		receiver?.let {
 			(owner as Context).unregisterReceiver(it)
 		}
 		receiver = null
-	}
-}
+	}//fun onPause
+}//object ScannerManager

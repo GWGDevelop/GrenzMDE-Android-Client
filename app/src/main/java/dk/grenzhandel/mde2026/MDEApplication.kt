@@ -10,7 +10,7 @@ class MDEApplication: Application()
 	{
 		super.onCreate()
 		MDEConfig = MDEConfigData.GetConfig(this)
-	}
+	}//fun onCreate
 
 
-}
+}//class MDEApplication

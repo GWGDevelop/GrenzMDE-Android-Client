@@ -3,6 +3,8 @@
 	"MDEStartupTitle": "Mobile Datenerfassung im Grenzhandel",
 	"srvrAddress": "W-Thrawn19.grenzhandel.local",
 	"srvrPort": 9999,
+	"TCPTerminator": "||>><<||",
+	"TCPTimeout": 15000,
 	"NAVDefaultCompany": "Poetzsch",
 	"NAVAvailableCompanies": [
 		"Poetzsch",

@@ -19,7 +19,8 @@ class ActLogin : AppCompatActivity()
 	lateinit var BtnLogin: Button
 	lateinit var Config: MDEConfigData
 
-	override fun onCreate(savedInstanceState: Bundle?) {
+	override fun onCreate(savedInstanceState: Bundle?)
+	{
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContentView(R.layout.activity_login)
@@ -36,14 +37,14 @@ class ActLogin : AppCompatActivity()
 		Config = (application as MDEApplication).MDEConfig
 		LbConnection.text = Config.NAVSelectedCompany + "@" + Config.srvrAddress
 		ScannerManager.initialize(this, this, ::OnScanner)
-	}
+	}//fun onCreate
 
 	private fun OnClickBtnLogin(aView: View)
 	{
 		Toast.makeText(this, "Moin User ${EdUser.text} !", Toast.LENGTH_SHORT).show()
 //		val intServerConnect = Intent(this, ServerConnect::class.java)
 //		startActivity(intServerConnect)
-	}
+	}//fun OnClickBtnLogin
 
 	//--------------------------------------------------------------------------------
 	private fun OnScanner(Barcode: ScanResult)
@@ -54,6 +55,6 @@ class ActLogin : AppCompatActivity()
 			Toast.makeText(this, "Scan: ${Barcode.Barcode} vom Typ ${Barcode.Type}", Toast.LENGTH_SHORT).show()
 
 		EdUser.setText(Barcode.Barcode)
-	}
+	}//fun OnScanner
 
-}
+}//class ActLogin

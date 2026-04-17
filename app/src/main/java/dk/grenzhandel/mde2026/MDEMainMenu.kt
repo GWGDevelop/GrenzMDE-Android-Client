@@ -7,7 +7,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dk.grenzhandel.mde2026.R
 
-class MDEMainMenu : AppCompatActivity() {
+class MDEMainMenu : AppCompatActivity()
+{
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
@@ -18,4 +19,4 @@ class MDEMainMenu : AppCompatActivity() {
 			insets
 		}
 	}
-}
+}//class MDEMainMenu
