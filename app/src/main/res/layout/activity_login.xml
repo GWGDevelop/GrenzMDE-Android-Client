@@ -7,18 +7,28 @@
 		android:layout_height="match_parent">
 
 
+	<!-- Zentrierter Container mit fester Breite -->
 	<TextView
 			android:id="@+id/LbServerConnection"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="16dp"
-			android:layout_marginTop="16dp"
+			android:layout_marginEnd="8dp"
 			android:text="Company@Server"
+			app:layout_constraintBottom_toBottomOf="@+id/BtnCloseConnection"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/BtnCloseConnection"
+			app:layout_constraintTop_toTopOf="@+id/BtnCloseConnection" />
+
+	<ImageButton
+			android:id="@+id/BtnCloseConnection"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Verbindung schließen"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent" />
+			app:layout_constraintTop_toTopOf="parent"
+			app:srcCompat="@android:drawable/ic_lock_power_off" />
 
-
-	<!-- Zentrierter Container mit fester Breite -->
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/BoxLogin"
 			android:layout_width="@dimen/loginBoxWidth"
@@ -92,7 +102,6 @@
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,14 +13,19 @@ import java.util.concurrent.Executors
 
 object MDETcpClient
 {
+	private var ServerAddress: String = ""
+	private var Port: Int = 9999
+	private var Timeout: Int = 10000
 	private var Terminator: String = "\n"
+	private var IsConnected: Boolean = false
+
+
 	private var socket: Socket? = null
 	private var reader: InputStreamReader? = null
 	private var writer: OutputStreamWriter? = null
 	private val uiHandler = Handler(Looper.getMainLooper())
 	private val executor = Executors.newSingleThreadExecutor()
 	private var waitDialog: ProgressDialog? = null
-	private var IsConnected: Boolean = false
 
 	private fun showWait(ctx: Context, text: String) {
 		uiHandler.post {
@@ -50,10 +55,13 @@ object MDETcpClient
 			else
 				try {
 					showWait(ctx, "Verbinde mit Server...")
+					ServerAddress = aHost
+					Port = aPort
+					Timeout = aTimeout
 					Terminator = aTerminator
 					socket = Socket()
-					socket!!.connect(InetSocketAddress(aHost, aPort), aTimeout)
-					socket!!.soTimeout = aTimeout
+					socket!!.connect(InetSocketAddress(ServerAddress, Port), Timeout)
+					socket!!.soTimeout = Timeout
 					reader = InputStreamReader(socket!!.getInputStream(), Charsets.UTF_8)
 					writer = OutputStreamWriter(socket!!.getOutputStream(), Charsets.UTF_8)
 					hideWait()
@@ -70,9 +78,9 @@ object MDETcpClient
 	}//fun Connect
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	fun SendCommand(ctx: Context, JSONCommand: String, ReplyCallback: (String) -> Unit)
+	fun SendCommand(ctx: Context, JSONCommand: String, WaitMessage: String, ReplyCallback: (String) -> Unit)
 	{
-		showWait(ctx, "Sende Befehl...")
+		showWait(ctx, WaitMessage)
 
 		executor.execute {
 			try {
@@ -139,4 +147,5 @@ object MDETcpClient
 		writer = null
 		socket = null
 	}//fun Disconnect
+
 }//object MDETcpClient

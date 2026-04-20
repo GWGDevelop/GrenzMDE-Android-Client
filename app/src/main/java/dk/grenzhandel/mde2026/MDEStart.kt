@@ -9,9 +9,11 @@ import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,11 +21,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import org.json.JSONObject
+import kotlin.system.exitProcess
 
 class MDEStart : AppCompatActivity() {
 	private val STORAGE_PERMISSION_REQUEST = 1234
 	lateinit var Config: MDEConfigData
 	lateinit var BtnConnect: Button
+	lateinit var BtnCloseApp: ImageButton
 	lateinit var TxTitle: TextView
 	lateinit var TxServer: TextView
 	lateinit var TxPort: TextView
@@ -40,8 +44,13 @@ class MDEStart : AppCompatActivity() {
 			v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 			insets
 		}
+		onBackPressedDispatcher.addCallback(this) { OnClickBack() }
+
 		BtnConnect = findViewById<Button>(R.id.btnConnect)
 		BtnConnect.setOnClickListener(this::OnClickBtnConnect)
+		BtnCloseApp = findViewById<ImageButton>(R.id.BtnCloseApp)
+		BtnCloseApp.setOnClickListener(this::OnClickClose)
+
 		TxTitle = findViewById<TextView>(R.id.txStartupTitle)
 		TxServer = findViewById<TextView>(R.id.txServer)
 		TxPort = findViewById<TextView>(R.id.txPort)
@@ -77,6 +86,17 @@ class MDEStart : AppCompatActivity() {
 		UpdateButtons()
 	} //fun onCreate
 
+	private fun OnClickBack()
+	{
+		finishAffinity()
+		exitProcess(0)
+	}
+
+	private fun OnClickClose(aView: View)
+	{
+		OnClickBack()
+	}
+
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	private fun ensureStoragePermission(): Boolean {
 		val permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -102,60 +122,40 @@ class MDEStart : AppCompatActivity() {
 	} //fun UpdateButtons
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	private fun ShowWaitDialog(Title: String, Msg: String): AlertDialog
-	{
-		val builder = AlertDialog.Builder(this)
-		builder.setTitle(Title)
-		builder.setMessage(Msg)
-		builder.setCancelable(false)
-		return builder.show()
-	} //fun ShowWaitDialog
-
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	private fun OnClickBtnConnect(aView: View)
 	{
 		if ( SelectedCompany == "")
 			Toast.makeText(this@MDEStart, "Kein Mandant ausgewählt. Kann nicht verbinden.", Toast.LENGTH_LONG).show()
-		else {
+		else
+		{
 			Config.NAVSelectedCompany = SelectedCompany
-
-			val Svr = Config.srvrAddress
-			val Prt = Config.srvrPort
-			val Trm = Config.TCPTerminator
-			val TOut = Config.TCPTimeout
-//				MDETcpClient.Connect(this, Config.srvrAddress, Config.srvrPort, Config.TCPTerminator, Config.TCPTimeout)
-
-			MDETcpClient.Connect(this, Svr, Prt, Trm, TOut)
-			{ IsConnected ->
-				ProcessConnectResult(IsConnected)
-			}
+			MDETcpClient.Connect(this, Config.srvrAddress, Config.srvrPort,
+												Config.TCPTerminator, Config.TCPTimeout, ::ProcessConnectResult)
 		}
 	}//fun OnClickBtnConnect
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	fun ProcessConnectResult(IsConnected: Boolean)
 	{
-		if (IsConnected) {
-			val Cmd = """{"action":"hello","device":"PPMDE-99"}"""
-			Log.d("TCP", "Sende an Server: ${Cmd}")
-
-			MDETcpClient.SendCommand(this, Cmd) { Reply ->
-				EvalHelloReply(Reply)
-			}
-
-		} else {
+		if (IsConnected)
+		{
+			val Cmd = """{"action":"hello","device":"${Config.MDEDeviceName}","company":"${Config.NAVSelectedCompany}"}"""
+			MDETcpClient.SendCommand(this, Cmd, "Starte Anmeldung", ::EvalHelloReply)
+		}
+		else
+		{
 			AlertDialog.Builder(this)
 				.setTitle("Fehler")
 				.setMessage("Server antwortet nicht.")
 				.setPositiveButton("OK", null)
 				.show()
 		}
-
 	}//fun ProcessConnectResult
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	fun EvalHelloReply(Reply: String)
 	{
+		CommandReader.EvalReply(Reply)
 		try {
 			Log.d("TCP", "Antwort vom Server: ${Reply}")
 			val RespJSON = JSONObject(Reply)
@@ -168,10 +168,11 @@ class MDEStart : AppCompatActivity() {
 			else
 			{
 				Toast.makeText(this@MDEStart, "unbekannter Seitenaufruf: ${page}", Toast.LENGTH_LONG).show()
-				Log.d("TCP", "Unerwartete Antwort: ${RespJSON}")
+				Log.e("TCP", "Unerwartete Antwort: ${RespJSON}")
 			}
 		}
-		catch (e: Error) {
+		catch (e: Error)
+		{
 			Toast.makeText(this@MDEStart, "Fehler in der Server-Antwort: ${Reply}", Toast.LENGTH_LONG).show()
 			Log.e("TCP", "Unerwartete Antwort: ${Reply}")
 		}

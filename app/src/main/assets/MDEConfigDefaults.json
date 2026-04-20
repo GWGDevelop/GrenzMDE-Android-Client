@@ -1,6 +1,8 @@
 {
+	"UseDefaultConfig": true,
 	"appConfigFile": "Config.json",
 	"MDEStartupTitle": "Mobile Datenerfassung im Grenzhandel",
+	"MDEDeviceName": "PM66 MDE-00",
 	"srvrAddress": "W-Thrawn19.grenzhandel.local",
 	"srvrPort": 9999,
 	"TCPTerminator": "||>><<||",

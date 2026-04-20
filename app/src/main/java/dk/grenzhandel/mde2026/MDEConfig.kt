@@ -10,9 +10,11 @@ import java.io.File
 import kotlin.system.exitProcess
 
 data class MDEConfigData(
+	var UseDefaultConfig: Boolean,
 	var appConfigDir: String,
 	val appConfigFile: String,
 	var appConfigFileExists: Boolean,
+	var MDEDeviceName: String,
 	var MDEStartupTitle: String,
 	var srvrAddress: String,
 	var srvrPort: Int,
@@ -54,24 +56,25 @@ data class MDEConfigData(
 		fun GetConfig(aContext: Context): MDEConfigData
 		{
 			var Result = DefaultConfig(aContext)
-/*
-			try {
-				val StorageDir = Environment.getExternalStoragePublicDirectory(Result.appConfigDir)
-				val ConfigFile = File(StorageDir, Result.appConfigFile)
-				if (!ConfigFile.exists())
-				{
-					Result.appConfigFileExists = false
-					SaveConfig(Result, aContext)
+			if (!Result.UseDefaultConfig)
+			{
+				try {
+					val StorageDir = Environment.getExternalStoragePublicDirectory(Result.appConfigDir)
+					val ConfigFile = File(StorageDir, Result.appConfigFile)
+					if (!ConfigFile.exists())
+					{
+						Result.appConfigFileExists = false
+						SaveConfig(Result, aContext)
+					}
+					else	{
+						Result = Gson().fromJson(ConfigFile.readText(), MDEConfigData::class.java)
+						Result.appConfigFileExists = true
+					}
 				}
-				else	{
-					Result = Gson().fromJson(ConfigFile.readText(), MDEConfigData::class.java)
-					Result.appConfigFileExists = true
+				catch (e: Error) {
+					Toast.makeText(aContext, "Fehler beim Laden der Konfigurationsdatei!", Toast.LENGTH_LONG).show()
 				}
 			}
-			catch (e: Error) {
-				Toast.makeText(aContext, "Fehler beim Laden der Konfigurationsdatei!", Toast.LENGTH_LONG).show()
-			}
- */
 			return Result
 		} //fun GetConfig
 
