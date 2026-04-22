@@ -37,12 +37,13 @@ object MDETcpClient
 		}
 	}
 
+	//--------------------------------------------------------------------------------------------
 	private fun hideWait()
 	{
 		uiHandler.post { waitDialog?.dismiss() }
 	}//fun hideWait
 
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//--------------------------------------------------------------------------------------------
 	fun Connect(ctx: Context, aHost: String, aPort: Int,
 								aTerminator: String, aTimeout: Int,  OnConnected: (Boolean) -> Unit
 								)
@@ -77,7 +78,7 @@ object MDETcpClient
 		}
 	}//fun Connect
 
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//--------------------------------------------------------------------------------------------
 	fun SendCommand(ctx: Context, JSONCommand: String, WaitMessage: String, ReplyCallback: (String) -> Unit)
 	{
 		showWait(ctx, WaitMessage)
@@ -101,7 +102,7 @@ object MDETcpClient
 			} catch (ex: SocketTimeoutException) {
 				hideWait()
 				uiHandler.post {
-					ReplyCallback("""{"error":"Timeout waiting for server reply"}""")
+					ReplyCallback("""{"error":"Keine Antwort vom Server - Zeitüberschreitung"}""")
 				}
 			} catch (ex: Exception) {
 				hideWait()
@@ -133,7 +134,7 @@ object MDETcpClient
 		}
 	}//fun readUntilTerminator
 
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//--------------------------------------------------------------------------------------------
 	fun Disconnect()
 	{
 		try {

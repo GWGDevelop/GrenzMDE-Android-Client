@@ -10,22 +10,22 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import org.json.JSONObject
 import androidx.activity.addCallback
 
 
-class ActLogin : AppCompatActivity()
+class ActLogin : MDEActivity()
 {
 	lateinit var LbConnection: TextView
 	lateinit var EdUser: EditText
 	lateinit var EdPwd:EditText
 	lateinit var BtnLogin: Button
 	lateinit var BtnCloseConnection: ImageButton
-	lateinit var Config: MDEConfigData
+	lateinit var BtnInfo: ImageButton
 
+	//--------------------------------------------------------------------------------------------
 	override fun onCreate(savedInstanceState: Bundle?)
 	{
 		super.onCreate(savedInstanceState)
@@ -36,68 +36,78 @@ class ActLogin : AppCompatActivity()
 			v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 			insets
 		}
-		onBackPressedDispatcher.addCallback(this) { OnClickBack() }
-
-		LbConnection = findViewById<TextView>(R.id.LbServerConnection)
+		LbConnection = findViewById<TextView>(R.id.LbConnection)
 		EdUser = findViewById<EditText>(R.id.EdUserName)
 		EdPwd = findViewById<EditText>(R.id.EdPwd)
 		BtnLogin = findViewById<Button>(R.id.BtnLogin)
-		BtnLogin.setOnClickListener(this::OnClickBtnLogin)
 		BtnCloseConnection = findViewById<ImageButton>(R.id.BtnCloseConnection)
-		BtnCloseConnection.setOnClickListener(this::OnClickDisconnect)
+		BtnInfo =	findViewById<ImageButton>(R.id.BtnInfo)
 
-		Config = (application as MDEApplication).MDEConfig
-		LbConnection.text = Config.NAVSelectedCompany + "@" + Config.srvrAddress
+		LbConnection.text = ConnectionInfo()
+		BtnCloseConnection.setOnClickListener(this::OnClickDisconnect)
+		BtnLogin.setOnClickListener(this::OnClickBtnLogin)
+		BtnInfo.setOnClickListener(this::OnClickShowHelp)
+		onBackPressedDispatcher.addCallback(this) { OnClickBack() }
+
 		ScannerManager.initialize(this, this, ::OnScanner)
 	}//fun onCreate
 
+	//--------------------------------------------------------------------------------------------
 	private fun OnClickBack()
 	{
 		val Cmd = """{"action":"goodbye"}"""
 		MDETcpClient.SendCommand(this, Cmd, "", {})
 		MDETcpClient.Disconnect()
 		finish()
-	}
+	}//fun OnClickBack
 
-	private fun OnClickBtnLogin(aView: View)
-	{
-		Toast.makeText(this, "Moin User ${EdUser.text} !", Toast.LENGTH_SHORT).show()
-	}//fun OnClickBtnLogin
-
+	//--------------------------------------------------------------------------------
 	private fun OnClickDisconnect(aView: View)
 	{
 		OnClickBack()
-	}
+	}//fun OnClickDisconnect
+
+	//--------------------------------------------------------------------------------------------
+	private fun OnClickBtnLogin(aView: View)
+	{
+		val Cmd = """{"action":"login","username":"${EdUser.text}","password":"${EdPwd.text}"}"""
+		MDETcpClient.SendCommand(this, Cmd, "Anmeldung mit Benutzername/ID", ::EvalLoginReply)
+		EdPwd.setText("")
+	}//fun OnClickBtnLogin
+
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	private fun	OnClickShowHelp(aView: View)
+	{
+			ActMessage.Show(this, getString(R.string.scannerHelp), "Scanner-Einstellungen", true, "Verstanden")
+	}//fun	OnClickShowHelp
 
 	//--------------------------------------------------------------------------------
 	private fun OnScanner(Barcode: ScanResult)
 	{
-		val Cmd = """{"action":"login","barcode":"${Barcode}"}"""
+		val Cmd = """{"action":"login","barcode":"${Barcode.Barcode}"}"""
 		MDETcpClient.SendCommand(this, Cmd, "Anmeldung mit Barcode", ::EvalLoginReply)
+		EdUser.setText("")
+		EdPwd.setText("")
 	}//fun OnScanner
 
+	//--------------------------------------------------------------------------------
 	fun EvalLoginReply(Reply: String)
 	{
-		try {
-			Log.d("TCP", "Antwort vom Server: ${Reply}")
-			val RespJSON = JSONObject(Reply)
-			val page = RespJSON.optString("page").lowercase()
-			if (page == "login")
-			{
-				val itLogin = Intent(this@ActLogin, ActLogin::class.java)
-				startActivity(itLogin)
-			}
-			else
-			{
-				Toast.makeText(this@ActLogin, "unbekannter Seitenaufruf: ${page}", Toast.LENGTH_LONG).show()
-				Log.e("TCP", "Unerwartete Antwort: ${RespJSON}")
-			}
-		}
-		catch (e: Error)
+		if (CommandReader.EvalReply(Reply))
 		{
-			Toast.makeText(this@ActLogin, "Fehler in der Server-Antwort: ${Reply}", Toast.LENGTH_LONG).show()
-			Log.e("TCP", "Unerwartete Antwort: ${Reply}")
+			when (CommandReader.NewPage)
+			{
+				Const.commandMainMenu -> {
+					EdUser.setText("")
+					EdPwd.setText("")
+					startActivity(Intent(this, ActMainMenu::class.java))
+				}
+				Const.commandMessage -> ActMessage.Show(this, CommandReader.Messsage)
+				else -> ActMessage.Show(this, "Der Server hat einen unzulässigen Seitenaufruf gesendet: ${CommandReader.NewPage}", "Fehler")
+			}
 		}
-	}
+		else //CommandReader meldet Antwort als ungültig
+			ActMessage.Show(this, "Ungültige Antwort vom Server. Support kontaktieren", "Server-Fehler")
+	}//fun EvalLoginReply
 
 }//class ActLogin

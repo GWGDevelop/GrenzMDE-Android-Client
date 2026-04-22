@@ -9,7 +9,7 @@
 
 	<!-- Zentrierter Container mit fester Breite -->
 	<TextView
-			android:id="@+id/LbServerConnection"
+			android:id="@+id/LbConnection"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="16dp"
@@ -22,8 +22,8 @@
 
 	<ImageButton
 			android:id="@+id/BtnCloseConnection"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
 			android:text="Verbindung schließen"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
@@ -102,6 +102,17 @@
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent" />
+
+	<ImageButton
+			android:id="@+id/BtnInfo"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
+			android:layout_marginTop="4dp"
+			app:layout_constraintEnd_toEndOf="@+id/BtnCloseConnection"
+			app:layout_constraintHorizontal_bias="0.0"
+			app:layout_constraintStart_toStartOf="@+id/BtnCloseConnection"
+			app:layout_constraintTop_toBottomOf="@+id/BtnCloseConnection"
+			app:srcCompat="@android:drawable/ic_dialog_info" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

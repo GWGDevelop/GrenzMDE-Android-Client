@@ -18,58 +18,62 @@ object ScannerManager: DefaultLifecycleObserver
 {
 	private var receiver: BroadcastReceiver? = null
 	private var listener: ((ScanResult) -> Unit)? = null
-	private lateinit var MDEConfig: MDEConfigData
+	private lateinit var Config: MDEConfigData
 
+	//--------------------------------------------------------------------------------------------
 	fun initialize(aContext: Context, aLifecycleOwner: LifecycleOwner, onScan: (ScanResult) -> Unit)
 	{
-		MDEConfig = (aContext.applicationContext as MDEApplication).MDEConfig
+		Config = (aContext.applicationContext as MDEApplication).Config
 		listener = onScan
 		aLifecycleOwner.lifecycle.addObserver(this)
 		register(aContext)
 	}//fun initialize
 
+	//--------------------------------------------------------------------------------------------
 	@SuppressLint("UnspecifiedRegisterReceiverFlag")
 	private fun register(aContext: Context)
 	{
 		if (receiver != null) return
 
 		receiver = object : BroadcastReceiver() {
-			override fun onReceive(aContext: Context, BrdCstIntent: Intent) {
-				if (BrdCstIntent.action != MDEConfig.scnIntentAction)
+			override fun onReceive(aContext: Context, BrdCstIntent: Intent)
+			{
+				if (BrdCstIntent.action != Config.scnIntentAction)
 					return
-				if (!BrdCstIntent.getBooleanExtra(MDEConfig.scnEventBCOK, false))
+				if (!BrdCstIntent.getBooleanExtra(Config.scnEventBCOK, false))
 					return
 
-				val BCData = BrdCstIntent.getByteArrayExtra(MDEConfig.scnEventBCContent)
-				val BCLength = BrdCstIntent.getIntExtra(MDEConfig.scnEventBCLength, 0)
-				var BCType = BrdCstIntent.getStringExtra(MDEConfig.scnEventBCType)?:""
+				val BCData = BrdCstIntent.getByteArrayExtra(Config.scnEventBCContent)
+				val BCLength = BrdCstIntent.getIntExtra(Config.scnEventBCLength, 0)
+				var BCType = BrdCstIntent.getStringExtra(Config.scnEventBCType)?:""
 
 				if (BCData != null) {
 					var Barcode = String(BCData, 0, BCLength, Charsets.UTF_8)
 
-					if (!MDEConfig.scnAllowedTypes.contains(BCType))
+					if (!Config.scnAllowedTypes.contains(BCType))
 					{
-						if (MDEConfig.scnDebugBarcodeTypes)
+						if (Config.scnDebugBarcodeTypes)
 							Toast.makeText(aContext, "Barcode-Typ nicht zugelassen: ${Barcode}, Typ: ${BCType}", Toast.LENGTH_SHORT).show()
 						return
 					}
-					if ((MDEConfig.scnPrefix > "") &&
-						(Barcode.substring(0, MDEConfig.scnPrefix.length) == MDEConfig.scnPrefix))
+					if ((Config.scnPrefix > "") &&
+						(Barcode.substring(0, Config.scnPrefix.length) == Config.scnPrefix))
 					{
-						Barcode = Barcode.substring(MDEConfig.scnPrefix.length)
+						Barcode = Barcode.substring(Config.scnPrefix.length)
 					}
-					if ((MDEConfig.scnSuffix > "") &&
-						(Barcode.substring(Barcode.length - MDEConfig.scnSuffix.length) == MDEConfig.scnSuffix))
+					if ((Config.scnSuffix > "") &&
+						(Barcode.substring(Barcode.length - Config.scnSuffix.length) == Config.scnSuffix))
 					{
-						Barcode = Barcode.substring(0, Barcode.length - MDEConfig.scnSuffix.length)
+						Barcode = Barcode.substring(0, Barcode.length - Config.scnSuffix.length)
 					}
 					listener?.invoke(ScanResult(Barcode, BCType))
 				}
 			}
 		}
-		aContext.registerReceiver(receiver, IntentFilter(MDEConfig.scnIntentAction))
+		aContext.registerReceiver(receiver, IntentFilter(Config.scnIntentAction))
 	}//fun register
 
+	//--------------------------------------------------------------------------------------------
 	override fun onPause(owner: LifecycleOwner)
 	{
 		receiver?.let {

@@ -4,13 +4,14 @@ import android.app.Application
 
 class MDEApplication: Application()
 {
-	lateinit var MDEConfig: MDEConfigData
+	lateinit var Config: MDEConfigData
+	lateinit var Const: MDEConst
 
+	//--------------------------------------------------------------------------------------------
 	override fun onCreate()
 	{
 		super.onCreate()
-		MDEConfig = MDEConfigData.GetConfig(this)
+		Config = MDEConfigData.GetConfig(this)
+		Const = MDEConst()
 	}//fun onCreate
-
-
 }//class MDEApplication

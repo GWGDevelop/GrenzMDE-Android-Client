@@ -1,3 +1,23 @@
 <resources>
 	<string name="app_name">MDE 2026</string>
+	<string name="scannerHelp"><![CDATA[
+		<p>Diese App unterstützt das Empfangen von Scannerdaten in Geräten vom Typ PointMobile PM66.<br>
+		Damit diese korrekt als Scanner-Input erkannt werden müssen in<br>
+			Einstellungen -> ScanSettings -> Basic<br>
+		folgende Einstellungen vorgenommen werden:<br>
+			Result type -> Intent Broadcast<br>
+			Terminator  -> none<br>
+ 		</p>
+		<p>In den ScanSettings sind noch mehrere Einträge unter "Custom intent" angegeben.
+		Diese müssen mit den Einträgen in der Config-Datei dieser App übereinstimmen.
+		Die Datei steht üblicherweise in /Documents/Config.json.<br>
+			scnIntentAction -> Intent action (default: device.scanner.EVENT)<br>
+			scnEventBCOK -> Extra decode result (default: EXTRA_EVENT_DECODE_RESULT)<br>
+			scnEventBCContent ->  Extra decode bytes value (default: EXTRA_EVENT_DECODE_VALUE)<br>
+			scnEventBCLength -> Extra decode length (default: EXTRA_EVENT_DECODE_LENGTH)<br>
+			scnEventBCType -> Extra symbol name (default: EXTRA_EVENT_SYMBOL_NAME)<p>
+		</p>
+		]]>
+	</string>
+
 </resources>

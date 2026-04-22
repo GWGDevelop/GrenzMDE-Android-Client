@@ -37,6 +37,7 @@ data class MDEConfigData(
 
 	companion object
 	{
+		//--------------------------------------------------------------------------------------------
 		fun DefaultConfig (aContext: Context): MDEConfigData
 		{
 			val json = aContext.assets.open("MDEConfigDefaults.json").bufferedReader().use{it.readText()}
@@ -53,6 +54,7 @@ data class MDEConfigData(
 			}
 		} //fun DefaultConfig
 
+		//--------------------------------------------------------------------------------------------
 		fun GetConfig(aContext: Context): MDEConfigData
 		{
 			var Result = DefaultConfig(aContext)
@@ -78,6 +80,7 @@ data class MDEConfigData(
 			return Result
 		} //fun GetConfig
 
+		//--------------------------------------------------------------------------------------------
 		fun SaveConfig(Config: MDEConfigData, aContext: Context)
 		{
 			try {
@@ -97,5 +100,5 @@ data class MDEConfigData(
 				Log.e("MDEConfig", "Fehler beim Speichern der Datei!", e)
 			}
 		} //fun SaveConfig
-	} //companion Object
+	}//companion object
 }

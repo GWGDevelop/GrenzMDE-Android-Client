@@ -5,11 +5,11 @@
 		android:id="@+id/main"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context=".MDEMainMenu">
+		tools:context=".ActMainMenu">
 
 	<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/LayoutTopBar"
-			android:layout_width="409dp"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintHorizontal_bias="0.0"
@@ -17,33 +17,35 @@
 			app:layout_constraintTop_toTopOf="parent">
 
 		<TextView
-				android:id="@+id/LbUserName"
+				android:id="@+id/TxConnection"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_marginStart="8dp"
-				android:layout_marginTop="13dp"
-				android:layout_marginEnd="8dp"
-				android:text="User Name"
+				android:text="User@DB.Server"
 				app:layout_constraintBottom_toBottomOf="@+id/BtnLogoff"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toEndOf="@+id/BtnLogoff"
-				app:layout_constraintTop_toBottomOf="@+id/LbServerConnection" />
+				app:layout_constraintTop_toBottomOf="@+id/LbTitle" />
 
 		<TextView
-				android:id="@+id/LbServerConnection"
+				android:id="@+id/LbTitle"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_marginStart="8dp"
-				android:layout_marginTop="8dp"
-				android:text="Company@Server"
+				android:layout_marginTop="4dp"
+				android:text="Funktionsauswahl"
+				android:textAlignment="center"
+				android:textSize="20sp"
+				android:textStyle="bold"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toEndOf="@+id/BtnLogoff"
-				app:layout_constraintTop_toTopOf="@+id/BtnLogoff" />
+				app:layout_constraintTop_toTopOf="@+id/BtnLogoff"
+				/>
 
 		<ImageButton
 				android:id="@+id/BtnLogoff"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_width="50dp"
+				android:layout_height="50dp"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				app:srcCompat="@android:drawable/ic_lock_lock" />
@@ -51,6 +53,7 @@
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
 	<ScrollView
+			android:id="@+id/ScVwButtons"
 			android:layout_width="0dp"
 			android:layout_height="0dp"
 			android:layout_marginStart="12dp"
@@ -64,10 +67,16 @@
 			app:layout_constraintTop_toBottomOf="@+id/LayoutTopBar">
 
 		<LinearLayout
+				android:id="@+id/BxButtons"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:orientation="vertical">
 
+			<Button
+					android:id="@+id/button2"
+					android:layout_width="match_parent"
+					android:layout_height="103dp"
+					android:text="Button" />
 		</LinearLayout>
 	</ScrollView>
 

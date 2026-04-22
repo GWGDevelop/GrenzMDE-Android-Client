@@ -4,4 +4,5 @@
 	<color name="white">#FFFFFFFF</color>
 	<color name="companyBtn_selected">#1634DC</color>
 	<color name="companyBtn">#03A9F4</color>
+	<color name="messageBackground">@android:color/holo_orange_light</color>
 </resources>
