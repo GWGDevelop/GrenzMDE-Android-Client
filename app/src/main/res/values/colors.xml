@@ -5,4 +5,5 @@
 	<color name="companyBtn_selected">#1634DC</color>
 	<color name="companyBtn">#03A9F4</color>
 	<color name="messageBackground">@android:color/holo_orange_light</color>
+	<color name="messageBorder">@android:color/holo_orange_dark</color>
 </resources>

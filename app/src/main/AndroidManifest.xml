@@ -19,6 +19,7 @@
 			android:theme="@style/Theme.MDE2026">
 		<activity
 				android:name=".ActMessage"
+				android:theme="@style/TransparentActivity"
 				android:exported="false" />
 		<activity
 				android:name=".ActMainMenu"

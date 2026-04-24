@@ -20,8 +20,11 @@
 		<item name="android:backgroundTint">@color/design_default_color_secondary_variant</item>
 	</style>
 
-	<style name="MessageActivity">
-		<item name="android:background">@android:color/holo_orange_light</item>
+	<style name="TransparentActivity"
+		parent="Theme.MaterialComponents.DayNight.NoActionBar">
+		<!-- Fenster durchsichtig -->
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowBackground">@android:color/transparent</item>
 	</style>
 
 
